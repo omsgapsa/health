@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Case study: building a multi-agent system for a sales team</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --muted: #5c5c5c;
+    --rule: #e2e2e2;
+    --accent: #1f3864;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141414;
+      --fg: #ededed;
+      --muted: #a8a8a8;
+      --rule: #333333;
+      --accent: #9db8e8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+  main { max-width: 42rem; margin: 0 auto; }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin: 0 0 0.4rem; color: var(--accent); }
+  h2 { font-size: 1.1rem; margin: 2rem 0 0.5rem; color: var(--accent); }
+  p.standfirst { color: var(--muted); margin: 0 0 1.5rem; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+  ul { padding-left: 1.2rem; }
+  li { margin-bottom: 0.4rem; }
+  footer { color: var(--muted); font-size: 0.9rem; margin-top: 2.5rem; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Building a multi-agent system for a sales team, and measuring whether anyone used it</h1>
+<p class="standfirst">A short case study. Written without naming my employer, the product or any client. The design decisions and the lessons are the point.</p>
+
+<h2>The setting</h2>
+<p>I work on product strategy for an enterprise SaaS platform sold into a regulated industry. Buyers there are cautious, evaluation cycles are long, and product claims get checked. The sales team was asking product specialists for demo support faster than the specialists could supply it.</p>
+
+<h2>The problem, as I found it</h2>
+<p>The obvious request was "we need more demo capacity". That was not the real problem. When I looked at where specialist hours were going, the pattern was that optimistic qualification was sending scarce specialists into demos that were never going to convert. The constraint was not capacity. It was that nothing filtered what reached the specialists, and nothing gave sellers a reliable way to answer product questions on their own.</p>
+
+<h2>What I built</h2>
+<p>I designed and built a two-agent system end to end, on my own, in a low-code agent platform. I authored the knowledge base myself: 22 structured packs covering positioning, capability boundaries, competitive comparisons and objection handling.</p>
+<ul>
+  <li><strong>A positioning coach.</strong> Answers seller questions about what the product does, who it is for and how it compares, grounded only in the knowledge packs rather than open-ended generation.</li>
+  <li><strong>A demo qualifier.</strong> Runs a 7-factor scoring model over an opportunity and returns a recommendation, so a demo request is triaged before it consumes a specialist's day.</li>
+</ul>
+<p>I deployed both inside the chat tool the sales team already lives in, rather than as a separate application. Adoption friction is usually about where a tool sits, not what it can do.</p>
+
+<h2>The design decision I care most about: guardrails</h2>
+<p>Selling software into a regulated industry means an overclaim is not a harmless exaggeration. It is a credibility problem with a buyer whose own compliance team will check. A general-purpose assistant pointed at product material will happily describe roadmap items as though they shipped, because the material talks about both.</p>
+<p>So I built maturity governance into the knowledge base itself. Every capability carries a state, and the agents are constrained to answer within it, with explicit anti-overclaim instructions. If a seller asks whether the product does something that is planned rather than built, the correct answer is the honest one, and the system is designed to give it.</p>
+<p>My working view of generative AI in commercial settings is roughly this: the transformative part is compressing the distance between a question and a grounded answer. The dangerous part is that a fluent wrong answer is indistinguishable from a right one at the point of use. Almost all the engineering effort that matters goes into the second problem.</p>
+
+<h2>Shipping was not the finish line</h2>
+<p>I instrumented the deployment from day one, because a launched tool that nobody uses looks identical to a successful one if you only count the launch.</p>
+<p>In the first five weeks the two agents handled 253 sessions, with zero abandoned and zero escalated, every engaged session resolved, and 81.6% of answers rated good quality across 133 evaluated questions.</p>
+<p>The useful finding was not in those numbers. It was what they implied when set against how many people could have been using the system. Answer quality was not the binding constraint. Uptake was. The gap between "this works" and "this is used" is an organisational problem, not a model problem, and no amount of tuning closes it.</p>
+
+<h2>What I would do differently</h2>
+<ul>
+  <li><strong>Secure the adoption path before building.</strong> I optimised the artefact first and the rollout second. That order should be reversed. A named owner, a moment in the existing workflow and a visible sponsor are prerequisites, not a launch task.</li>
+  <li><strong>Instrument the knowledge base, not just the conversation.</strong> Session-level telemetry told me what people asked. It told me much less about which packs were doing the work and which were dead weight.</li>
+  <li><strong>Design the evaluation before the build.</strong> I assessed answer quality after the fact. A fixed question set defined up front would have made every iteration measurable instead of impressionistic.</li>
+</ul>
+
+<h2>Honest limits</h2>
+<p>This was built on a low-code platform, by one person, for one organisation, at a scale of hundreds of sessions rather than millions. It is not a multi-tenant product and it was never asked to be. What it did teach me transfers: grounding beats generation, guardrails are the actual engineering, the deployment surface decides adoption, and the interesting failure mode is almost never the model.</p>
+
+<hr>
+<footer>
+<p>Written by Eswar Subramanian Ramakrishnan. Details are deliberately generalised. Happy to go deeper on the design in conversation.</p>
+</footer>
+
+</main>
+</body>
+</html>
